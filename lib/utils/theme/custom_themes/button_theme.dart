@@ -4,7 +4,7 @@ import '../../constants/colors.dart';
 class AppButtonTheme {
   static FilledButtonThemeData lightFilledButtonTheme = FilledButtonThemeData(
     style: FilledButton.styleFrom(
-      minimumSize: Size(300, 50),
+      minimumSize: Size(250, 50),
       backgroundColor: AppColors.secondary,
       foregroundColor: Colors.white,
       padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 24),
@@ -30,7 +30,7 @@ class AppButtonTheme {
   static ElevatedButtonThemeData lightElevatedButtonTheme =
       ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(
-      backgroundColor: AppColors.secondary,
+      backgroundColor: AppColors.primary,
       foregroundColor: Colors.white,
       elevation: 4,
       padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 24),
@@ -85,15 +85,14 @@ class AppButtonTheme {
     style: TextButton.styleFrom(
       foregroundColor: AppColors.secondary,
       textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
     ),
   );
 
   static TextButtonThemeData darkTextButtonTheme = TextButtonThemeData(
     style: TextButton.styleFrom(
       foregroundColor: AppColors.primary,
+      enableFeedback: false,
       textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
     ),
   );
 }

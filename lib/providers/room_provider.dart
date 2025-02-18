@@ -1,5 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../models/booking.dart';
 import '../models/room.dart';
 import '../services/dio_services.dart';
 
@@ -15,11 +17,26 @@ final roomsProvider = FutureProvider<List<Room>>((ref) async {
   }
 });
 
+final firebaseProvider =
+    Provider<FirebaseFirestore>((ref) => FirebaseFirestore.instance);
+
+final fetchrooms = FutureProvider<List<Room>>((ref) async {
+  final fbwatcher = ref.watch(firebaseProvider);
+  final rawData = await fbwatcher.collection('rooms').get();
+  return rawData.docs.map((data) => Room.fromJson(data.data())).toList();
+});
+
+final fetchBookings = FutureProvider<List<Booking>>((ref) async {
+  final fbwatcher = ref.watch(firebaseProvider);
+  final rawData = await fbwatcher.collection('booking').get();
+  return rawData.docs.map((data) => Booking.fromJson(data.data())).toList();
+});
+
 final searchQueryProvider = StateProvider((ref) => '');
 
 final filteredRoomsProvider = Provider<List<Room>>((ref) {
   final search = ref.watch(searchQueryProvider).toLowerCase();
-  return ref.watch(roomsProvider).maybeWhen(
+  return ref.watch(fetchrooms).maybeWhen(
         data: (rooms) => search.isEmpty
             ? rooms
             : rooms

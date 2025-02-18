@@ -1,21 +1,22 @@
-class User {
+class CustomUser {
   String name;
   String email;
   String phone;
   String password;
-  final String userType;
+  String userType;
   DateTime lastLogin;
 
-  User(
-      {required this.name,
-      required this.email,
-      required this.password,
+  CustomUser(
+      {this.name = 'name',
+      this.email = 'email',
+      this.password = 'password',
       this.phone = '00000000',
-      required this.userType,
-      required this.lastLogin});
+      this.userType = 'guest',
+      DateTime? lastLogin})
+      : lastLogin = lastLogin ?? DateTime.now();
 
-  factory User.fromJson(Map<String, dynamic> json) {
-    return User(
+  factory CustomUser.fromJson(Map<String, dynamic> json) {
+    return CustomUser(
       name: json['name'],
       email: json['email'],
       password: json['password'],

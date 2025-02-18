@@ -20,8 +20,8 @@ class SplashScreen extends StatelessWidget {
             stops: const [0.0, 0.7, 1.0],
             colors: [
               AppColors.primary,
-              Colors.deepPurple.shade100,
-              Colors.white,
+              const Color.fromARGB(255, 4, 107, 64),
+              Colors.white
             ],
           ),
         ),

@@ -7,7 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import '../testmodels/booking.dart';
+import '../models/booking.dart';
 
 class BookScreen extends ConsumerStatefulWidget {
   final Room room;
@@ -40,11 +40,14 @@ class _BookScreenState extends ConsumerState<BookScreen> {
     }
   }
 
-  int _fullprice() =>
-      widget.room.price.toInt() *
-      _numberOfPersons *
-      ((_checkOutDate.day.toInt()) - (_checkInDate.day.toInt()));
+  int _calc() {
+    if (_checkOutDate.day.toInt() - _checkInDate.day.toInt() <= 0) {
+      return 31 - _checkInDate.day.toInt() + _checkOutDate.day.toInt();
+    }
+    return _checkOutDate.day.toInt() - _checkInDate.day.toInt();
+  }
 
+  int _fullprice() => widget.room.price.toInt() * _numberOfPersons * _calc();
   Future<void> _book(DateTime startDate, DateTime endDate) async {
     final booking = Booking(
       userId: '0',
@@ -54,9 +57,58 @@ class _BookScreenState extends ConsumerState<BookScreen> {
       numberOfPersons: _numberOfPersons,
       totalPrice: _fullprice(),
     );
-    await FirebaseFirestore.instance
-        .collection('booking')
-        .add(booking.toJson());
+
+    if (widget.room.isAvailable(startDate, endDate)) {
+      try {
+        await FirebaseFirestore.instance
+            .collection('booking')
+            .add(booking.toJson());
+
+        final roomSnapshot = await FirebaseFirestore.instance
+            .collection('rooms')
+            .where('id', isEqualTo: widget.room.id)
+            .limit(1)
+            .get();
+
+        if (roomSnapshot.docs.isNotEmpty) {
+          final roomDocId = roomSnapshot.docs.first.id;
+          await FirebaseFirestore.instance
+              .collection('rooms')
+              .doc(roomDocId)
+              .update({
+            'bookedDates': FieldValue.arrayUnion([
+              {
+                'start': Timestamp.fromDate(startDate),
+                'end': Timestamp.fromDate(endDate),
+              }
+            ])
+          });
+
+          customSnackbar(
+            context,
+            'Booking confirmed from ${DateFormat.yMMMd().format(startDate)} to ${DateFormat.yMMMd().format(endDate)}',
+          );
+        } else {
+          customDialogBox(
+            context,
+            title: 'Error',
+            message: 'Room not found.',
+          );
+        }
+      } catch (e) {
+        customDialogBox(
+          context,
+          title: 'Error',
+          message: 'There was an error processing your booking: $e',
+        );
+      }
+    } else {
+      customDialogBox(
+        context,
+        title: 'Warning',
+        message: 'Room isn\'t available on the chosen dates. Try again.',
+      );
+    }
   }
 
   @override
@@ -160,8 +212,6 @@ class _BookScreenState extends ConsumerState<BookScreen> {
                   backgroundColor: AppColors.primary,
                   padding: const EdgeInsets.symmetric(vertical: 15)),
               onPressed: () {
-                customSnackbar(context,
-                    'Booking confirmed from ${DateFormat.yMMMd().format(_checkInDate)} to ${DateFormat.yMMMd().format(_checkOutDate)}');
                 _book(_checkInDate, _checkOutDate);
               },
               child: Center(

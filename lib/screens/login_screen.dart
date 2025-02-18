@@ -29,7 +29,10 @@ class _LoginScreenState extends State<LoginScreen> {
     } else {
       print("Validation Failed");
     }
-    customSnackbar(context, 'Your email or password is incorrect');
+    if (mounted) {
+      customSnackbar(context, 'Your email or password is incorrect');
+    }
+
     return false;
   }
 
@@ -47,7 +50,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
-          child: Container(
+          child: SizedBox(
             height: context.height,
             width: double.infinity,
             child: Column(
@@ -125,7 +128,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   },
                                   child: const Text('Forgot Paswword ?',
                                       style:
-                                          TextStyle(color: Colors.redAccent)),
+                                          TextStyle(color: Colors.lightBlue)),
                                 ),
                               ),
                             ),
@@ -141,15 +144,15 @@ class _LoginScreenState extends State<LoginScreen> {
                                     : null;
                               },
                               style: ButtonStyle(
-                                padding: MaterialStateProperty.all(
+                                padding: WidgetStateProperty.all(
                                     const EdgeInsets.fromLTRB(20, 10, 20, 10)),
-                                shape: MaterialStateProperty.all(
+                                shape: WidgetStateProperty.all(
                                   RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12),
                                     side: const BorderSide(color: Colors.white),
                                   ),
                                 ),
-                                fixedSize: MaterialStateProperty.all(
+                                fixedSize: WidgetStateProperty.all(
                                   Size(MediaQuery.of(context).size.width * 0.6,
                                       50),
                                 ),

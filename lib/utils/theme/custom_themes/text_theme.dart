@@ -44,10 +44,10 @@ class AppTextTheme {
         fontWeight: FontWeight.normal,
         color: AppColors.textPrimary),
     bodyMedium: TextStyle(
-        fontSize: 14,
-        fontWeight: FontWeight.bold,
-        color: AppColors.textPrimary,
-        fontStyle: FontStyle.italic),
+      fontSize: 14,
+      fontWeight: FontWeight.bold,
+      color: AppColors.textPrimary,
+    ),
     bodySmall: TextStyle(
         fontSize: 12,
         fontWeight: FontWeight.normal,

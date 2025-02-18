@@ -1,13 +1,14 @@
+import 'package:chawi_hotel/screens/widget_tree.dart';
 import 'package:chawi_hotel/utils/theme/theme.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shimmer/main.dart';
 
 import 'screens/splash_screen.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   /*SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
@@ -15,7 +16,6 @@ void main() async {
       statusBarBrightness: Brightness.light,
     ),
   );
-
   SystemChrome.setEnabledSystemUIMode(
     SystemUiMode.immersiveSticky,
   );*/
@@ -34,7 +34,7 @@ class MainApp extends StatelessWidget {
       themeMode: ThemeMode.system,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      home: SafeArea(child: SplashScreen()),
+      home: SafeArea(child: WidgetTree()),
     );
   }
 }

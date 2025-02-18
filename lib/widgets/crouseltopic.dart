@@ -1,5 +1,6 @@
 import 'package:chawi_hotel/utils/constants/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class Crouseltopic extends StatelessWidget {
   final bool isSelected;
@@ -28,12 +29,16 @@ class Crouseltopic extends StatelessWidget {
       child: Text(
         topic,
         style: isSelected
-            ? TextStyle(
+            ? GoogleFonts.raleway(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
               )
-            : Theme.of(context).textTheme.titleLarge,
+            : GoogleFonts.raleway(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
       ),
     );
   }

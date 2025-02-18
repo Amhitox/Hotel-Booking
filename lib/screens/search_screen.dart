@@ -15,7 +15,7 @@ class SearchScreen extends ConsumerStatefulWidget {
 class _SearchScreenState extends ConsumerState<SearchScreen> {
   @override
   Widget build(BuildContext context) {
-    final rooms = ref.watch(roomsProvider);
+    final rooms = ref.watch(fetchrooms);
     final filteredRooms = ref.watch(filteredRoomsProvider);
 
     return Scaffold(
@@ -27,7 +27,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             child: FormBuilder(
               child: FormBuilderTextField(
                 name: 'search',
-                autofocus: true,
                 decoration: InputDecoration(
                   helperStyle: TextStyle(color: Colors.black87),
                   hintText: 'Search Here...',

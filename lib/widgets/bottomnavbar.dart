@@ -2,7 +2,6 @@ import 'package:chawi_hotel/screens/search_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../screens/home_screen.dart';
-import '../utils/constants/colors.dart';
 
 class Bottomnavscreen extends StatefulWidget {
   const Bottomnavscreen({super.key});
@@ -31,7 +30,7 @@ class _BottomnavscreenState extends State<Bottomnavscreen> {
       bottomNavigationBar: BottomNavigationBar(
         elevation: 8,
         backgroundColor: const Color.fromARGB(157, 2, 58, 44),
-        unselectedItemColor: AppColors.primary,
+        unselectedItemColor: Colors.black87,
         selectedItemColor: Colors.white,
         currentIndex: _currentIndex,
         onTap: _onItemTapped,

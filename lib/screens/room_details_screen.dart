@@ -2,6 +2,7 @@ import 'package:chawi_hotel/screens/book_screen.dart';
 import 'package:chawi_hotel/utils/constants/responisve.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../models/room.dart';
 import '../utils/constants/colors.dart';
@@ -22,6 +23,7 @@ class _RoomDetailsScreenState extends ConsumerState<RoomDetails> {
     'assets/images/Room_3.jpg',
   ];
   bool _isFva = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -119,18 +121,18 @@ class _RoomDetailsScreenState extends ConsumerState<RoomDetails> {
                         children: [
                           Text(
                             widget.room.name,
-                            style: TextStyle(
+                            style: GoogleFonts.raleway(
                               color: Colors.white,
-                              fontSize: 30,
+                              fontSize: 26,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           Text(
-                            '${widget.room.price} DH',
-                            style: TextStyle(
+                            '${widget.room.price}\$',
+                            style: GoogleFonts.raleway(
                               color: Colors.white,
                               fontSize: 20,
-                              fontWeight: FontWeight.w600,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ],
@@ -140,9 +142,10 @@ class _RoomDetailsScreenState extends ConsumerState<RoomDetails> {
                       padding: EdgeInsets.symmetric(horizontal: 20),
                       child: Text(
                         widget.room.description,
-                        style: TextStyle(
+                        style: GoogleFonts.workSans(
                           color: Colors.white54,
                           fontSize: 16,
+                          fontWeight: FontWeight.normal,
                         ),
                         maxLines: 3,
                         overflow: TextOverflow.ellipsis,
