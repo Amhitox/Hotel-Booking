@@ -14,12 +14,16 @@ class FirebaseApi {
     }
   }
 
-  static Future<void> signUP(String email, String password) async {
+  static Future<void> signUp(
+      String? email, String? password, String? name) async {
     try {
-      await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(email: email, password: password);
+      UserCredential userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(email: email!, password: password!);
+
+      // Update the user's display name
+      await userCredential.user?.updateDisplayName(name);
     } catch (e) {
-      print('Error: $e');
+      throw e;
     }
   }
 

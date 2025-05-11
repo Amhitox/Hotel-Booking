@@ -1,5 +1,6 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:chawi_hotel/providers/room_provider.dart';
+import 'package:chawi_hotel/screens/login_screen.dart';
 import 'package:chawi_hotel/screens/search_screen.dart';
 import 'package:chawi_hotel/services/firebase_api.dart';
 import 'package:chawi_hotel/utils/constants/colors.dart';
@@ -39,36 +40,35 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 241, 248, 233),
         elevation: 0,
-        leading: Padding(
-          padding: const EdgeInsets.fromLTRB(40, 20, 0, 0),
-          child: Icon(
-            size: 30,
-            Icons.menu_sharp,
-            color: AppColors.primary,
-          ),
-        ),
         actions: [
           Padding(
-              padding: const EdgeInsets.fromLTRB(0, 20, 40, 0),
-              child: IconButton(
-                onPressed: () => FirebaseAuth.instance.signOut(),
-                icon: Icon(
-                  Icons.notifications_none,
-                  color: AppColors.primary,
-                  size: 30,
-                ),
-              ))
+            padding: const EdgeInsets.fromLTRB(0, 20, 40, 0),
+            child: IconButton(
+              onPressed: () {
+                FirebaseAuth.instance.signOut();
+                Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const LoginScreen()));
+              },
+              icon: Icon(
+                Icons.logout,
+                color: AppColors.primary,
+                size: 30,
+              ),
+            ),
+          ),
         ],
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(30, 40, 0, 0),
+              padding: const EdgeInsets.fromLTRB(30, 20, 0, 0),
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  'Hi ${user!.displayName},',
+                  'Hi ${user!.displayName?.split(' ')[0]},',
                   style: GoogleFonts.raleway(
                     fontSize: 25,
                     fontWeight: FontWeight.bold,

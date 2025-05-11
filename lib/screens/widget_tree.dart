@@ -1,5 +1,3 @@
-import 'package:chawi_hotel/main.dart';
-import 'package:chawi_hotel/screens/home_screen.dart';
 import 'package:chawi_hotel/screens/splash_screen.dart';
 import 'package:chawi_hotel/widgets/bottomnavbar.dart';
 import 'package:firebase_auth/firebase_auth.dart';

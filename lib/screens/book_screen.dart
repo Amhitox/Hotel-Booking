@@ -6,6 +6,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
+import 'dart:io';
+import 'package:flutter/services.dart';
 
 import '../models/booking.dart';
 
@@ -25,14 +31,17 @@ class _BookScreenState extends ConsumerState<BookScreen> {
   Future<void> _selectDate(BuildContext context, bool isCheckIn) async {
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime.now(),
+      initialDate: isCheckIn ? _checkInDate : _checkOutDate,
+      firstDate: isCheckIn ? DateTime.now() : _checkInDate,
       lastDate: DateTime(2026),
     );
     if (picked != null) {
       setState(() {
         if (isCheckIn) {
           _checkInDate = picked;
+          if (_checkOutDate.isBefore(_checkInDate)) {
+            _checkOutDate = _checkInDate.add(const Duration(days: 1));
+          }
         } else {
           _checkOutDate = picked;
         }
@@ -41,72 +50,318 @@ class _BookScreenState extends ConsumerState<BookScreen> {
   }
 
   int _calc() {
-    if (_checkOutDate.day.toInt() - _checkInDate.day.toInt() <= 0) {
-      return 31 - _checkInDate.day.toInt() + _checkOutDate.day.toInt();
-    }
-    return _checkOutDate.day.toInt() - _checkInDate.day.toInt();
+    return _checkOutDate.difference(_checkInDate).inDays;
   }
 
   int _fullprice() => widget.room.price.toInt() * _numberOfPersons * _calc();
+
+  Future<void> _generateAndSharePDF() async {
+    try {
+      final pdf = pw.Document();
+
+      final logoImage = pw.MemoryImage(
+        (await rootBundle.load('assets/images/logo.png')).buffer.asUint8List(),
+      );
+
+      pdf.addPage(
+        pw.Page(
+          pageFormat: PdfPageFormat.a4,
+          build: (pw.Context context) {
+            return pw.Container(
+              padding: const pw.EdgeInsets.all(40),
+              child: pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  pw.Row(
+                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                    children: [
+                      pw.Image(logoImage, width: 100, height: 100),
+                      pw.Column(
+                        crossAxisAlignment: pw.CrossAxisAlignment.end,
+                        children: [
+                          pw.Text('CHAWİ HOTEL',
+                              style: pw.TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: pw.FontWeight.bold,
+                                  color: PdfColors.blue900)),
+                          pw.Text('Booking Confirmation',
+                              style: pw.TextStyle(
+                                  fontSize: 16, color: PdfColors.grey700)),
+                        ],
+                      ),
+                    ],
+                  ),
+                  pw.SizedBox(height: 30),
+                  pw.Container(
+                    padding: const pw.EdgeInsets.all(10),
+                    decoration: pw.BoxDecoration(
+                      color: PdfColors.blue50,
+                      borderRadius:
+                          const pw.BorderRadius.all(pw.Radius.circular(5)),
+                    ),
+                    child: pw.Text(
+                      'Booking Reference: ${DateTime.now().millisecondsSinceEpoch}',
+                      style: pw.TextStyle(
+                        fontSize: 14,
+                        color: PdfColors.blue900,
+                        fontWeight: pw.FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  pw.SizedBox(height: 30),
+                  pw.Container(
+                    padding: const pw.EdgeInsets.all(15),
+                    decoration: pw.BoxDecoration(
+                      border: pw.Border.all(color: PdfColors.grey300),
+                      borderRadius:
+                          const pw.BorderRadius.all(pw.Radius.circular(10)),
+                    ),
+                    child: pw.Column(
+                      crossAxisAlignment: pw.CrossAxisAlignment.start,
+                      children: [
+                        pw.Text('Room Details',
+                            style: pw.TextStyle(
+                                fontSize: 18,
+                                fontWeight: pw.FontWeight.bold,
+                                color: PdfColors.blue900)),
+                        pw.Divider(color: PdfColors.grey300),
+                        pw.SizedBox(height: 10),
+                        pw.Row(
+                          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                          children: [
+                            pw.Text('Room Name:',
+                                style: pw.TextStyle(
+                                    fontWeight: pw.FontWeight.bold)),
+                            pw.Text(widget.room.name),
+                          ],
+                        ),
+                        pw.SizedBox(height: 5),
+                        pw.Row(
+                          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                          children: [
+                            pw.Text('Price per night:',
+                                style: pw.TextStyle(
+                                    fontWeight: pw.FontWeight.bold)),
+                            pw.Text('\$${widget.room.price.toInt()}'),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  pw.SizedBox(height: 20),
+                  pw.Container(
+                    padding: const pw.EdgeInsets.all(15),
+                    decoration: pw.BoxDecoration(
+                      border: pw.Border.all(color: PdfColors.grey300),
+                      borderRadius:
+                          const pw.BorderRadius.all(pw.Radius.circular(10)),
+                    ),
+                    child: pw.Column(
+                      crossAxisAlignment: pw.CrossAxisAlignment.start,
+                      children: [
+                        pw.Text('Booking Details',
+                            style: pw.TextStyle(
+                                fontSize: 18,
+                                fontWeight: pw.FontWeight.bold,
+                                color: PdfColors.blue900)),
+                        pw.Divider(color: PdfColors.grey300),
+                        pw.SizedBox(height: 10),
+                        pw.Row(
+                          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                          children: [
+                            pw.Text('Check-in Date:',
+                                style: pw.TextStyle(
+                                    fontWeight: pw.FontWeight.bold)),
+                            pw.Text(DateFormat.yMMMd().format(_checkInDate)),
+                          ],
+                        ),
+                        pw.SizedBox(height: 5),
+                        pw.Row(
+                          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                          children: [
+                            pw.Text('Check-out Date:',
+                                style: pw.TextStyle(
+                                    fontWeight: pw.FontWeight.bold)),
+                            pw.Text(DateFormat.yMMMd().format(_checkOutDate)),
+                          ],
+                        ),
+                        pw.SizedBox(height: 5),
+                        pw.Row(
+                          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                          children: [
+                            pw.Text('Number of Guests:',
+                                style: pw.TextStyle(
+                                    fontWeight: pw.FontWeight.bold)),
+                            pw.Text('$_numberOfPersons'),
+                          ],
+                        ),
+                        pw.SizedBox(height: 5),
+                        pw.Row(
+                          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                          children: [
+                            pw.Text('Number of Nights:',
+                                style: pw.TextStyle(
+                                    fontWeight: pw.FontWeight.bold)),
+                            pw.Text('${_calc()}'),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  pw.SizedBox(height: 20),
+                  pw.Container(
+                    padding: const pw.EdgeInsets.all(15),
+                    decoration: pw.BoxDecoration(
+                      color: PdfColors.blue50,
+                      borderRadius:
+                          const pw.BorderRadius.all(pw.Radius.circular(10)),
+                    ),
+                    child: pw.Row(
+                      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                      children: [
+                        pw.Text('Total Amount:',
+                            style: pw.TextStyle(
+                                fontSize: 18,
+                                fontWeight: pw.FontWeight.bold,
+                                color: PdfColors.blue900)),
+                        pw.Text('\$${_fullprice()}',
+                            style: pw.TextStyle(
+                                fontSize: 18,
+                                fontWeight: pw.FontWeight.bold,
+                                color: PdfColors.blue900)),
+                      ],
+                    ),
+                  ),
+                  pw.SizedBox(height: 30),
+                  pw.Container(
+                    padding: const pw.EdgeInsets.all(15),
+                    decoration: pw.BoxDecoration(
+                      border: pw.Border.all(color: PdfColors.grey300),
+                      borderRadius:
+                          const pw.BorderRadius.all(pw.Radius.circular(10)),
+                    ),
+                    child: pw.Column(
+                      children: [
+                        pw.Text('Thank you for choosing CHAWİ HOTEL!',
+                            style: pw.TextStyle(
+                                fontSize: 14,
+                                color: PdfColors.grey700,
+                                fontStyle: pw.FontStyle.italic)),
+                        pw.SizedBox(height: 5),
+                        pw.Text(
+                            'For any inquiries, please contact us at support@chawihotel.com',
+                            style: pw.TextStyle(
+                                fontSize: 12, color: PdfColors.grey600)),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      );
+
+      final output = await getTemporaryDirectory();
+      final file = File('${output.path}/booking_confirmation.pdf');
+      await file.writeAsBytes(await pdf.save());
+
+      await Share.shareXFiles(
+        [XFile(file.path)],
+        text: 'Your CHAWİ HOTEL Booking Confirmation',
+      );
+    } catch (e) {
+      customDialogBox(
+        context,
+        title: 'Error',
+        message: 'Failed to generate PDF: $e',
+      );
+    }
+  }
+
   Future<void> _book(DateTime startDate, DateTime endDate) async {
-    final booking = Booking(
-      userId: '0',
-      roomId: widget.room.id,
-      startDate: startDate,
-      endDate: endDate,
-      numberOfPersons: _numberOfPersons,
-      totalPrice: _fullprice(),
-    );
+    if (_checkOutDate.isBefore(_checkInDate)) {
+      customDialogBox(
+        context,
+        title: 'Invalid Dates',
+        message: 'Check-out date must be after check-in date',
+      );
+      return;
+    }
 
-    if (widget.room.isAvailable(startDate, endDate)) {
-      try {
-        await FirebaseFirestore.instance
-            .collection('booking')
-            .add(booking.toJson());
+    if (_numberOfPersons > widget.room.maxPersons) {
+      customDialogBox(
+        context,
+        title: 'Too Many Guests',
+        message:
+            'This room can only accommodate ${widget.room.maxPersons} persons',
+      );
+      return;
+    }
 
-        final roomSnapshot = await FirebaseFirestore.instance
-            .collection('rooms')
-            .where('id', isEqualTo: widget.room.id)
-            .limit(1)
-            .get();
+    try {
+      final roomSnapshot = await FirebaseFirestore.instance
+          .collection('rooms')
+          .where('id', isEqualTo: widget.room.id)
+          .limit(1)
+          .get();
 
-        if (roomSnapshot.docs.isNotEmpty) {
-          final roomDocId = roomSnapshot.docs.first.id;
-          await FirebaseFirestore.instance
-              .collection('rooms')
-              .doc(roomDocId)
-              .update({
-            'bookedDates': FieldValue.arrayUnion([
-              {
-                'start': Timestamp.fromDate(startDate),
-                'end': Timestamp.fromDate(endDate),
-              }
-            ])
-          });
-
-          customSnackbar(
-            context,
-            'Booking confirmed from ${DateFormat.yMMMd().format(startDate)} to ${DateFormat.yMMMd().format(endDate)}',
-          );
-        } else {
-          customDialogBox(
-            context,
-            title: 'Error',
-            message: 'Room not found.',
-          );
-        }
-      } catch (e) {
+      if (roomSnapshot.docs.isEmpty) {
         customDialogBox(
           context,
           title: 'Error',
-          message: 'There was an error processing your booking: $e',
+          message: 'Room not found.',
         );
+        return;
       }
-    } else {
+
+      final roomDoc = roomSnapshot.docs.first;
+      final roomData = roomDoc.data();
+      final List<dynamic> bookedDates = roomData['bookedDates'] ?? [];
+
+      bool hasConflict = false;
+      for (var booking in bookedDates) {
+        final bookingStart = (booking['start'] as Timestamp).toDate();
+        final bookingEnd = (booking['end'] as Timestamp).toDate();
+
+        if (startDate.isBefore(bookingEnd) && endDate.isAfter(bookingStart)) {
+          hasConflict = true;
+          break;
+        }
+      }
+
+      if (hasConflict) {
+        customDialogBox(
+          context,
+          title: 'Warning',
+          message: 'Room isn\'t available on the chosen dates. Try again.',
+        );
+        return;
+      }
+
+      final newBooking = {
+        'start': Timestamp.fromDate(startDate),
+        'end': Timestamp.fromDate(endDate),
+        'numberOfPersons': _numberOfPersons,
+        'totalPrice': _fullprice(),
+        'bookingDate': Timestamp.now(),
+      };
+
+      await roomDoc.reference.update({
+        'bookedDates': FieldValue.arrayUnion([newBooking])
+      });
+
+      await _generateAndSharePDF();
+
+      customSnackbar(
+        context,
+        'Booking confirmed from ${DateFormat.yMMMd().format(startDate)} to ${DateFormat.yMMMd().format(endDate)}',
+      );
+    } catch (e) {
       customDialogBox(
         context,
-        title: 'Warning',
-        message: 'Room isn\'t available on the chosen dates. Try again.',
+        title: 'Error',
+        message: 'There was an error processing your booking: $e',
       );
     }
   }
