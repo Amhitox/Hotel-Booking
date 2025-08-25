@@ -1,17 +1,33 @@
-# Uncomment this line to define a global platform for your project
 platform :ios, '13.0'
 
 use_frameworks!
 use_modular_headers!
 
-# CocoaPods analytics send network stats synchronously affecting flutter build latency.
-ENV['COCOAPODS_DISABLE_STATS'] = 'true'
+target 'Runner' do
+  # Firebase
+  pod 'Firebase/Core'
+  pod 'Firebase/Auth'
+  pod 'Firebase/Firestore'
 
-project 'Runner', {
-  'Debug' => :debug,
-  'Profile' => :release,
-  'Release' => :release,
-}
+  # Additional Flutter dependencies that require iOS pods
+  # (Only needed if the plugin has a native iOS part)
+  pod 'share_plus', :path => '../.symlinks/plugins/share_plus/ios'
+  pod 'path_provider', :path => '../.symlinks/plugins/path_provider/ios'
+  pod 'smooth_page_indicator', :path => '../.symlinks/plugins/smooth_page_indicator/ios'
+  pod 'carousel_slider', :path => '../.symlinks/plugins/carousel_slider/ios'
+  pod 'firebase_core', :path => '../.symlinks/plugins/firebase_core/ios'
+  pod 'firebase_auth', :path => '../.symlinks/plugins/firebase_auth/ios'
+  pod 'cloud_firestore', :path => '../.symlinks/plugins/cloud_firestore/ios'
+  
+  # If you add more plugins with native iOS code, add them here similarly
 
-flutter_sdk_path = ENV['FLUTTER_ROOT'] || '/opt/flutter'  # Codemagic Flutter SDK path
-load File.join(flutter_sdk_path, 'packages', 'flutter_tools', 'bin', 'podhelper.rb')
+end
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      # Fix simulator build issues on M1/M2 Macs
+      config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
+    end
+  end
+end
