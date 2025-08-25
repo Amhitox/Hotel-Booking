@@ -1,0 +1,32 @@
+# Set a global platform for iOS
+platform :ios, '15.0'
+
+# Disable CocoaPods analytics
+ENV['COCOAPODS_DISABLE_STATS'] = 'true'
+
+# Suppress all warnings
+inhibit_all_warnings!
+
+# Use frameworks and modular headers (required for many Flutter plugins)
+use_frameworks!
+use_modular_headers!
+
+target 'Runner' do
+  # Flutter Pod helper
+  flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
+
+  # Add any other pods here if needed
+  # pod 'SomeOtherPod'
+end
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      # Set deployment target for all pods to 15.0
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
+
+      # Workaround for Firebase warnings with Xcode 14+
+      config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
+    end
+  end
+end

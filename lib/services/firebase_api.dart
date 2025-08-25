@@ -23,7 +23,7 @@ class FirebaseApi {
       // Update the user's display name
       await userCredential.user?.updateDisplayName(name);
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 

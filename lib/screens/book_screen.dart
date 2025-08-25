@@ -13,7 +13,6 @@ import 'package:share_plus/share_plus.dart';
 import 'dart:io';
 import 'package:flutter/services.dart';
 
-import '../models/booking.dart';
 
 class BookScreen extends ConsumerStatefulWidget {
   final Room room;

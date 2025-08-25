@@ -1,7 +1,6 @@
 import 'package:chawi_hotel/screens/signup.dart';
 import 'package:chawi_hotel/services/firebase_api.dart';
 import 'package:chawi_hotel/utils/constants/colors.dart';
-import 'package:chawi_hotel/utils/constants/responisve.dart';
 import 'package:chawi_hotel/widgets/bottomnavbar.dart';
 import 'package:chawi_hotel/widgets/notification.dart';
 import 'package:firebase_auth/firebase_auth.dart';
