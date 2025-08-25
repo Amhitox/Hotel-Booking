@@ -13,5 +13,5 @@ project 'Runner', {
   'Release' => :release,
 }
 
-flutter_application_path = File.expand_path('../..', __FILE__)
-eval(File.read(File.join(flutter_application_path, 'ios', 'flutter', 'podhelper.rb')), binding)
+flutter_sdk_path = ENV['FLUTTER_ROOT'] || '/opt/flutter'  # Codemagic Flutter SDK path
+load File.join(flutter_sdk_path, 'packages', 'flutter_tools', 'bin', 'podhelper.rb')
