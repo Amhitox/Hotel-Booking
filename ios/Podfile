@@ -7,19 +7,13 @@ use_frameworks!
 use_modular_headers!
 
 target 'Runner' do
-  # Flutter pods
-  pod 'FirebaseCore'
-  pod 'FirebaseFirestore'
-  pod 'FirebaseAuth'
-
-  # Add other Firebase/Flutter pods if you need them
+  flutter_install_all_ios_pods(File.dirname(File.realpath(__FILE__)))
 end
 
 post_install do |installer|
   installer.pods_project.targets.each do |target|
     target.build_configurations.each do |config|
       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
-      # Workaround for M1/M2 simulator
       config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
     end
   end
