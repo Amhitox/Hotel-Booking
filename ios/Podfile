@@ -1,28 +1,17 @@
 # Uncomment this line to define a global platform for your project
-platform :ios, '15.0'
+platform :ios, '13.0'
 
-ENV['COCOAPODS_DISABLE_STATS'] = 'true'
-inhibit_all_warnings!
-
-# CocoaPods 1.11+ requires this for M1/M2 simulators
 use_frameworks!
 use_modular_headers!
 
-# Load Flutter helper
-flutter_root = File.expand_path('..', Dir.pwd) + '/.flutter'
-load File.join(flutter_root, 'packages', 'flutter_tools', 'bin', 'podhelper.rb')
+# CocoaPods analytics send network stats synchronously affecting flutter build latency.
+ENV['COCOAPODS_DISABLE_STATS'] = 'true'
 
-target 'Runner' do
-  flutter_install_all_ios_pods(File.dirname(File.realpath(__FILE__)))
-end
+project 'Runner', {
+  'Debug' => :debug,
+  'Profile' => :release,
+  'Release' => :release,
+}
 
-post_install do |installer|
-  installer.pods_project.targets.each do |target|
-    target.build_configurations.each do |config|
-      # iOS deployment target
-      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
-      # Exclude arm64 for simulator to prevent M1/M2 issues
-      config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
-    end
-  end
-end
+flutter_application_path = File.expand_path('../..', __FILE__)
+eval(File.read(File.join(flutter_application_path, 'ios', 'flutter', 'podhelper.rb')), binding)
