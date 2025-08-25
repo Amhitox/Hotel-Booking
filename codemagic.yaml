@@ -13,6 +13,3 @@ workflows:
           flutter build ios --simulator
     artifacts:
       - build/ios/iphonesimulator/Runner.app
-    publishing:
-      email:
-        enabled: false
