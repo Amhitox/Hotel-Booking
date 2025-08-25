@@ -1,6 +1,6 @@
 import 'package:chawi_hotel/utils/theme/custom_themes/appbar_theme.dart';
 import 'package:chawi_hotel/utils/theme/custom_themes/input_theme.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide AppBarThemeData;
 import '../constants/colors.dart';
 import 'custom_themes/button_theme.dart';
 import 'custom_themes/text_theme.dart';
