@@ -1,4 +1,4 @@
-name: Build iOS App
+name: Build iOS App (Simulator)
 
 on:
   push:
@@ -14,7 +14,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # 2. Install Flutter
+      # 2. Setup Flutter
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -24,11 +24,26 @@ jobs:
       - name: Flutter Pub Get
         run: flutter pub get
 
-      # 4. Build iOS app for simulator (unsigned)
+      # 4. Clean Flutter
+      - name: Clean Flutter
+        run: flutter clean
+
+      # 5. Install CocoaPods
+      - name: Install CocoaPods
+        run: |
+          sudo gem install cocoapods
+          pod setup
+
+      # 6. Install iOS Pods
+      - name: Install iOS Pods
+        working-directory: ios
+        run: pod install
+
+      # 7. Build iOS App for Simulator
       - name: Build iOS App for Simulator
         run: flutter build ios --simulator --no-codesign
 
-      # 5. Upload the built .app as artifact
+      # 8. Upload .app as artifact
       - name: Upload iOS App Artifact
         uses: actions/upload-artifact@v4
         with:
