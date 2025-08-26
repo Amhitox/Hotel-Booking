@@ -3,27 +3,34 @@ name: Build iOS App
 on:
   push:
     branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   build-ios:
     runs-on: macos-latest
+
     steps:
-      # 1. Checkout the repo
-      - uses: actions/checkout@v3
+      # 1. Checkout repository
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
       # 2. Install Flutter
-      - uses: subosito/flutter-action@v2
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.19.0'
+          flutter-version: '3.35.1'
 
-      # 3. Get dependencies
-      - run: flutter pub get
+      # 3. Get Flutter dependencies
+      - name: Flutter Pub Get
+        run: flutter pub get
 
-      # 4. Build the iOS app for simulator
-      - run: flutter build ios --simulator --no-codesign
+      # 4. Build iOS app for simulator (unsigned)
+      - name: Build iOS App for Simulator
+        run: flutter build ios --simulator --no-codesign
 
-      # 5. Upload the .app as artifact
-      - uses: actions/upload-artifact@v3
+      # 5. Upload the built .app as artifact
+      - name: Upload iOS App Artifact
+        uses: actions/upload-artifact@v4
         with:
           name: ios-app
           path: build/ios/iphonesimulator/Runner.app
