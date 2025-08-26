@@ -24,7 +24,7 @@ jobs:
       - name: Clean Flutter
         run: flutter clean
 
-      # Build for simulator (auto-generates pods)
+      # Build for simulator (auto-generates all plugin symlinks)
       - name: Build iOS App for Simulator
         run: flutter build ios --simulator --no-codesign
 
