@@ -10,40 +10,34 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      # 1. Checkout repository
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # 2. Setup Flutter
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.35.1'
 
-      # 3. Get Flutter dependencies
       - name: Flutter Pub Get
         run: flutter pub get
 
-      # 4. Clean Flutter
       - name: Clean Flutter
         run: flutter clean
 
-      # 5. Install CocoaPods
+      - name: Clean iOS Pods
+        run: |
+          cd ios
+          rm -rf Pods Podfile.lock
+          pod cache clean --all || true
+
       - name: Install CocoaPods
         run: |
           sudo gem install cocoapods
           pod setup
 
-      # 6. Install iOS Pods
-      - name: Install iOS Pods
-        working-directory: ios
-        run: pod install
-
-      # 7. Build iOS App for Simulator
       - name: Build iOS App for Simulator
         run: flutter build ios --simulator --no-codesign
 
-      # 8. Upload .app as artifact
       - name: Upload iOS App Artifact
         uses: actions/upload-artifact@v4
         with:
