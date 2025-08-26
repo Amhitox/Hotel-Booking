@@ -10,7 +10,7 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      - name: Checkout Repository
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Setup Flutter
@@ -24,20 +24,11 @@ jobs:
       - name: Clean Flutter
         run: flutter clean
 
-      - name: Clean iOS Pods
-        run: |
-          cd ios
-          rm -rf Pods Podfile.lock
-          pod cache clean --all || true
-
-      - name: Install CocoaPods
-        run: |
-          sudo gem install cocoapods
-          pod setup
-
+      # Build for simulator (auto-generates pods)
       - name: Build iOS App for Simulator
         run: flutter build ios --simulator --no-codesign
 
+      # Upload the .app as artifact
       - name: Upload iOS App Artifact
         uses: actions/upload-artifact@v4
         with:
